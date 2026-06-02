@@ -22,7 +22,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://*.vercel.app",
-        # Add your production domain here
+        "https://approach-nu.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
