@@ -51,18 +51,21 @@ approach/                  ← monorepo root
 
 - A [Vercel](https://vercel.com) account (free tier works)
 - A [Google Cloud](https://console.cloud.google.com) project for OAuth
-- A PostgreSQL database — [Neon](https://neon.tech) free tier recommended
+- A PostgreSQL database — [Supabase](https://supabase.com) free tier recommended
 
 ---
 
-### Step 1 — Set up a PostgreSQL database (Neon, free)
+### Step 1 — Set up a PostgreSQL database (Supabase, free)
 
-1. Go to [neon.tech](https://neon.tech) → **New project** → give it a name.
-2. After creation, copy the **Connection string** that looks like:
+1. Go to [supabase.com](https://supabase.com) → **New project** → give it a name and a strong database password. Save that password somewhere safe.
+2. After the project finishes provisioning (~1–2 min), go to **Settings → Database → Connection string → URI**.
+3. Select the **Session** pooler tab (port **5432**) — this mode is required for SQLAlchemy compatibility.
+4. Copy the connection string. It looks like:
    ```
-   postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+   postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
    ```
-3. Save this — you'll use it as `DATABASE_URL` for the backend.
+   Replace `[password]` with the database password you set in step 1.
+5. Save this — you'll use it as `DATABASE_URL` for the backend.
 
 ---
 
@@ -92,7 +95,7 @@ approach/                  ← monorepo root
 
    | Key | Value |
    |-----|-------|
-   | `DATABASE_URL` | your Neon connection string |
+   | `DATABASE_URL` | your Supabase connection string (Session pooler URI) |
 
 4. Click **Deploy**.
 5. After deployment, copy the URL — it will look like `https://approach-backend-xxx.vercel.app`.
@@ -218,7 +221,7 @@ GraphiQL playground: [http://localhost:8000/graphql](http://localhost:8000/graph
 The backend uses **SQLAlchemy** and supports any SQLAlchemy-compatible database:
 
 - **Local dev:** SQLite (default, zero config, file `backend/crm.db`)
-- **Production:** PostgreSQL via `DATABASE_URL`
+- **Production:** PostgreSQL via `DATABASE_URL` (Supabase)
 
 Tables are created automatically on startup via `create_tables()`.
 
