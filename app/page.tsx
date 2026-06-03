@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Navbar } from '@/components/Navbar'
 import { FollowupBadge } from '@/components/FollowupBadge'
 import { StageBadge } from '@/components/StageBadge'
-import { fetchApplications, fetchMetrics } from '@/lib/graphql'
+import { fetchApplications, fetchMetrics } from '@/lib/api'
 import type { Application, DashboardMetrics, StageStat } from '@/types/crm'
 import { formatDate, getFollowupStatus } from '@/lib/utils'
 
@@ -22,7 +22,7 @@ export default function DashboardPage() {
       setApps(a)
       setMetrics(m)
     } catch (e: any) {
-      setError('Could not reach API. Is the backend running? Set NEXT_PUBLIC_GRAPHQL_URL in .env.local')
+      setError('Could not reach API. Is the backend running? Set NEXT_PUBLIC_API_URL in .env.local')
     } finally {
       setLoading(false)
     }

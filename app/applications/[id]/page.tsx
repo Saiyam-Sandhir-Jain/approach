@@ -6,7 +6,7 @@ import { Navbar } from '@/components/Navbar'
 import { ApplicationForm } from '@/components/ApplicationForm'
 import { FollowupBadge } from '@/components/FollowupBadge'
 import { StageBadge } from '@/components/StageBadge'
-import { fetchApplication } from '@/lib/graphql'
+import { fetchApplication } from '@/lib/api'
 import type { Application } from '@/types/crm'
 import { formatDate } from '@/lib/utils'
 

@@ -1,24 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 
+// "Add" button removed — use the "+ New" button on the Applications page instead
 const NAV = [
-  { href: '/',               label: 'Dashboard',   icon: GridIcon },
-  { href: '/applications',   label: 'Pipeline',     icon: ListIcon },
-  { href: '/approach',       label: 'Approach',     icon: CompassIcon },
-  { href: '/applications/new', label: 'Add',        icon: PlusIcon, accent: true },
+  { href: '/',             label: 'Dashboard', icon: GridIcon },
+  { href: '/applications', label: 'Pipeline',  icon: ListIcon },
+  { href: '/approach',     label: 'Approach',  icon: CompassIcon },
 ]
 
 export function Navbar() {
   const path = usePathname()
   const { data: session } = useSession()
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen]     = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -45,6 +45,7 @@ export function Navbar() {
 
   return (
     <>
+      {/* ── Desktop nav ─────────────────────────────────────────────────── */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 hidden sm:flex items-center justify-between px-6 h-14"
         style={{ background: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)', backdropFilter: 'blur(12px)' }}
@@ -57,19 +58,16 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-1">
-          {NAV.map(({ href, label, icon: Icon, accent }) => (
+          {NAV.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-heading font-semibold transition-all duration-150',
-                accent
-                  ? 'text-white'
-                  : path === href
+                path === href
                   ? 'text-white bg-white/10'
                   : 'text-zinc-400 hover:text-white hover:bg-white/5'
               )}
-              style={accent ? { backgroundColor: '#FF4500', boxShadow: '0 2px 10px rgba(255,69,0,0.3)' } : {}}
             >
               <Icon size={13} />
               {label}
@@ -111,7 +109,7 @@ export function Navbar() {
                     <p className="text-[10px] truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{session.user.email}</p>
                   </div>
                   <button
-                    onClick={() => signOut({ callbackUrl: '/login' })}
+                    onClick={() => { setUserMenuOpen(false); setShowLogoutModal(true) }}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-heading font-semibold transition-colors hover:bg-white/5"
                     style={{ color: '#f87171' }}
                   >
@@ -125,6 +123,7 @@ export function Navbar() {
         </div>
       </nav>
 
+      {/* ── Mobile bottom nav ────────────────────────────────────────────── */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-50 flex sm:hidden items-center justify-around py-2 px-2"
         style={{
@@ -134,21 +133,15 @@ export function Navbar() {
           paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
         }}
       >
-        {NAV.map(({ href, label, icon: Icon, accent }) => (
+        {NAV.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
             className={cn(
               'flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all',
-              accent ? 'text-white' : path === href ? '' : 'text-zinc-500'
+              path === href ? '' : 'text-zinc-500'
             )}
-            style={
-              accent
-                ? { backgroundColor: '#FF4500', boxShadow: '0 2px 10px rgba(255,69,0,0.3)' }
-                : path === href
-                ? { color: '#FF4500' }
-                : {}
-            }
+            style={path === href ? { color: '#FF4500' } : {}}
           >
             <Icon size={18} />
             <span className="text-[9px] font-heading font-semibold tracking-wide">{label}</span>
@@ -156,7 +149,7 @@ export function Navbar() {
         ))}
         {session?.user && (
           <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={() => setShowLogoutModal(true)}
             className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-zinc-500"
           >
             <UserAvatar user={session.user} size={20} />
@@ -166,9 +159,68 @@ export function Navbar() {
           </button>
         )}
       </nav>
+
+      {/* ── Logout confirmation modal ────────────────────────────────────── */}
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+          style={{ background: 'var(--bg-overlay)' }}
+          onClick={() => setShowLogoutModal(false)}
+        >
+          <div
+            className="bento-card noise w-full max-w-xs p-6 space-y-5"
+            style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.4)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Subtle orange glow */}
+            <div
+              className="pointer-events-none absolute inset-0 rounded-xl"
+              style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,69,0,0.07), transparent)' }}
+            />
+
+            {/* Icon */}
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
+              style={{ background: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.25)' }}
+            >
+              <LogoutIcon size={18} color="#f87171" />
+            </div>
+
+            {/* Copy */}
+            <div className="text-center space-y-1">
+              <h2 className="font-heading font-bold text-base" style={{ color: 'var(--text-primary)' }}>
+                Sign out?
+              </h2>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                You'll need to sign back in with Google to access your pipeline.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 py-2 rounded-lg font-heading font-semibold text-xs transition-all hover:opacity-80"
+                style={{ border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="flex-1 py-2 rounded-lg font-heading font-bold text-xs text-white transition-all hover:brightness-110 active:scale-95"
+                style={{ backgroundColor: '#f87171', boxShadow: '0 4px 14px rgba(248,113,113,0.3)' }}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
+
+// ── Sub-components ────────────────────────────────────────────────────────────
 
 function UserAvatar({ user, size }: { user: { name?: string | null; image?: string | null }; size: number }) {
   if (user.image) {
@@ -228,13 +280,6 @@ function CompassIcon({ size = 16 }: { size?: number }) {
     </svg>
   )
 }
-function PlusIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  )
-}
 function SunIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -260,9 +305,9 @@ function ChevronIcon({ size = 12 }: { size?: number }) {
     </svg>
   )
 }
-function LogoutIcon({ size = 14 }: { size?: number }) {
+function LogoutIcon({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
       <polyline points="16 17 21 12 16 7"/>
       <line x1="21" y1="12" x2="9" y2="12"/>
