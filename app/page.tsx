@@ -39,7 +39,7 @@ export default function DashboardPage() {
   const toggleAutoFollowUp = (id: string) => {
     setAutoFollowUps(prev => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id) else next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
   }
