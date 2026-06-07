@@ -8,9 +8,8 @@ import { cn } from '@/lib/utils'
 
 // "Add" button removed — use the "+ New" button on the Applications page instead
 const NAV = [
-  { href: '/',             label: 'Dashboard', icon: GridIcon },
-  { href: '/applications', label: 'Pipeline',  icon: ListIcon },
-  { href: '/approach',     label: 'Approach',  icon: CompassIcon },
+  { href: '/',         label: 'Dashboard', icon: GridIcon },
+  { href: '/approach', label: 'Approach',  icon: CompassIcon },
 ]
 
 export function Navbar() {

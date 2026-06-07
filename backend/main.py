@@ -88,6 +88,7 @@ class ApplicationBody(BaseModel):
     last_contact_date: str
     job_description_url: Optional[str] = None
     notes: Optional[str] = None
+    next_followup_date: Optional[str] = None
 
 
 class ContactBody(BaseModel):
@@ -190,7 +191,10 @@ def create_application(
         notes=body.notes,
         created_at=datetime.now(timezone.utc),
     )
-    m.recalculate_followup()
+    if body.next_followup_date:
+        m.next_followup_date = date.fromisoformat(body.next_followup_date)
+    else:
+        m.recalculate_followup()
     db.add(m)
     db.commit()
     db.refresh(m)
@@ -220,7 +224,10 @@ def update_application(
     m.channel             = ContactChannelEnum(body.channel)
     m.last_contact_date   = date.fromisoformat(body.last_contact_date)
     m.notes               = body.notes
-    m.recalculate_followup()
+    if body.next_followup_date:
+        m.next_followup_date = date.fromisoformat(body.next_followup_date)
+    else:
+        m.recalculate_followup()
     db.commit()
     db.refresh(m)
     return _app_dict(m)

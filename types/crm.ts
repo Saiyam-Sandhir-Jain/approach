@@ -55,6 +55,7 @@ export interface ApplicationInput {
   status: ApplicationStatus
   channel: ContactChannel
   lastContactDate: string
+  nextFollowupDate?: string
   notes?: string
 }
 

@@ -15,7 +15,6 @@ export default function DashboardPage() {
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
   const [slideOpen, setSlideOpen] = useState(false)
-  const [autoFollowUps, setAutoFollowUps] = useState<Set<string>>(new Set())
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -36,13 +35,6 @@ export default function DashboardPage() {
   const overdue  = apps.filter(a => getFollowupStatus(a.nextFollowupDate) === 'overdue')
   const recent   = apps.slice(0, 8)
 
-  const toggleAutoFollowUp = (id: string) => {
-    setAutoFollowUps(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) { next.delete(id) } else { next.add(id) }
-      return next
-    })
-  }
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-page)' }}>
@@ -210,14 +202,13 @@ export default function DashboardPage() {
                   <table className="w-full text-xs min-w-[620px]">
                     <thead>
                       <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                        {['Company', 'Role', 'Stage', 'Follow-up', 'Channel', 'Auto Follow-up'].map(h => (
+                        {['Company', 'Role', 'Stage', 'Follow-up', 'Channel'].map(h => (
                           <th key={h} className="text-left pb-2 font-heading font-semibold tracking-wide" style={{ color: 'var(--text-muted)' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {recent.map(a => {
-                        const isOn = autoFollowUps.has(a.id)
                         return (
                           <tr key={a.id} className="group hover:bg-white/3 transition-colors" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                             <td className="py-2.5 pr-3 font-heading font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -227,37 +218,7 @@ export default function DashboardPage() {
                             <td className="py-2.5 pr-3"><StageBadge stage={a.stage} /></td>
                             <td className="py-2.5 pr-3"><FollowupBadge dateStr={a.nextFollowupDate} /></td>
                             <td className="py-2.5 pr-3 text-xs" style={{ color: 'var(--text-muted)' }}>{a.channel.replace('_', ' ')}</td>
-                            <td className="py-2.5">
-                              <button
-                                onClick={() => toggleAutoFollowUp(a.id)}
-                                className="flex items-center gap-2 group/toggle"
-                                aria-label={isOn ? 'Disable auto follow-up' : 'Enable auto follow-up'}
-                              >
-                                {/* Track */}
-                                <span
-                                  className="relative inline-flex items-center w-8 h-4 rounded-full transition-colors duration-200 shrink-0"
-                                  style={{
-                                    background: isOn ? 'rgba(255,69,0,0.25)' : 'var(--bg-elevated)',
-                                    border: `1px solid ${isOn ? 'rgba(255,69,0,0.5)' : 'var(--border)'}`,
-                                  }}
-                                >
-                                  {/* Thumb */}
-                                  <span
-                                    className="absolute w-2.5 h-2.5 rounded-full transition-all duration-200"
-                                    style={{
-                                      left: isOn ? '14px' : '2px',
-                                      background: isOn ? '#FF4500' : 'var(--text-muted)',
-                                    }}
-                                  />
-                                </span>
-                                <span
-                                  className="text-[10px] font-heading font-semibold transition-colors"
-                                  style={{ color: isOn ? '#FF4500' : 'var(--text-muted)', minWidth: 18 }}
-                                >
-                                  {isOn ? 'On' : 'Off'}
-                                </span>
-                              </button>
-                            </td>
+
                           </tr>
                         )
                       })}

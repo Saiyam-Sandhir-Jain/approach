@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { cn, calcFollowupDate } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import {
   createApplication, updateApplication, deleteApplication,
   createContact, deleteContact,
@@ -31,6 +31,7 @@ export function ApplicationForm({ app }: Props) {
   const [status,      setStatus]      = useState<ApplicationStatus>(app?.status ?? 'PENDING')
   const [channel,     setChannel]     = useState<ContactChannel>(app?.channel  ?? 'LINKEDIN_DIRECT')
   const [lastContact, setLastContact] = useState(app?.lastContactDate ?? today)
+  const [nextFollowup, setNextFollowup] = useState(app?.nextFollowupDate ?? '')
   const [notes,       setNotes]       = useState(app?.notes ?? '')
 
   // Contacts
@@ -38,7 +39,6 @@ export function ApplicationForm({ app }: Props) {
   const [newContact,    setNewContact]    = useState<Partial<ContactInput>>({})
   const [addingContact, setAddingContact] = useState(false)
 
-  const followupPreview = calcFollowupDate(stage, lastContact)
 
   async function handleSave() {
     if (!companyName.trim() || !roleTitle.trim()) {
@@ -53,6 +53,7 @@ export function ApplicationForm({ app }: Props) {
         jobDescriptionUrl: jdUrl.trim() || undefined,
         stage, status, channel,
         lastContactDate: lastContact,
+        nextFollowupDate: nextFollowup || undefined,
         notes: notes.trim() || undefined,
       }
       if (app) { await updateApplication(app.id, input) }
@@ -155,10 +156,13 @@ export function ApplicationForm({ app }: Props) {
             <Field label="Last Contact Date">
               <input className="crm-input" type="date" value={lastContact} onChange={e => setLastContact(e.target.value)} />
             </Field>
-            <Field label="Auto Follow-up (preview)">
-              <div className="crm-input opacity-70 cursor-default select-none" style={{ color: 'var(--text-muted)' }}>
-                {followupPreview || '—  (no auto date for this stage)'}
-              </div>
+            <Field label="Next Follow-up Date">
+              <input
+                className="crm-input"
+                type="date"
+                value={nextFollowup}
+                onChange={e => setNextFollowup(e.target.value)}
+              />
             </Field>
           </div>
 

@@ -47,6 +47,7 @@ function appToBody(input: ApplicationInput) {
     channel:             input.channel,
     last_contact_date:   input.lastContactDate,
     job_description_url: input.jobDescriptionUrl ?? null,
+    next_followup_date:  input.nextFollowupDate  ?? null,
     notes:               input.notes ?? null,
   }
 }
